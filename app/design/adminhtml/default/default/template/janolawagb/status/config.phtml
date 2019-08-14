@@ -1,0 +1,108 @@
+<?php
+/* @var $this Janolaw_Agb_Block_Adminhtml_Status_Config */
+$missingConfig = $this->getNotConfiguredValues();
+$lastRunFlag = $this->getLastRunFlagData();
+
+/* @var $urlModel Mage_Adminhtml_Model_Url */
+$urlModel = Mage::getModel('adminhtml/url');
+$linkSysConfig = $urlModel->getUrl('adminhtml/system_config/edit', array('section' => 'agbdownload'));
+?>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4><?php echo $this->__('Configuration'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <?php if (isset($missingConfig['block_config'])): ?>
+            <?php $configOk = false; ?>
+            <h5><?php echo $this->__('The following block identifiers are not configured yet') . ':'; ?></h5>
+            <ul style="list-style-type: disc; margin-left: 1.5em;">
+                <?php foreach ($missingConfig['block_config'] as $type => $text): ?>
+                    <li><?php echo $text; ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p>
+                <?php echo $this->__('All block identifiers are configured...'); ?>
+            </p>
+        <?php endif; ?>
+
+        <br />
+        <?php foreach ($missingConfig as $k => $v): ?>
+            <?php
+            if ($k == 'block_config') {
+                continue; // already printed
+            } else {
+                echo '<p>' . $this->__('Missing configuration for') . ': <b>' . $v . '</b></p><br />';
+            }
+            ?>
+        <?php endforeach; ?>
+
+        <?php if (!empty($missingConfig)): ?>
+            <p>
+                <a href="<?php echo $linkSysConfig; ?>" target="_blank"><?php echo $this->__('Edit configuration'); ?></a>
+            </p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4><?php echo $this->__('Status'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <?php if (!$lastRunFlag->getId()): ?>
+            <?php echo $this->__('No synchronisation was done so far..!'); ?>
+        <?php else: ?>
+
+            <b><?php echo $this->__('Last synchronisation run') . ': ' . $this->convertUTCToLocaleTime($lastRunFlag->getLastUpdate()); ?></b><br/>
+            <?php $errors = $lastRunFlag->getFlagData(); ?>
+            <?php if (empty($errors)): ?>
+                <?php echo $this->__('Last synchronisation run was successful'); ?><br/>
+            <?php else: ?>
+                <?php echo $this->__('Last synchronisation run had errors') . ':'; ?><br/>
+                <ul style="list-style-type: disc; margin-left: 1.5em;">
+                    <?php foreach ($errors as $e): ?>
+                        <li><?php echo $e; ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <br /><br />
+        <p>
+            <button id="jl_btn_start_sync" onclick="jl_start_synchronisation()"><?php echo $this->__('Start synchronisation'); ?></button>
+        </p>
+    </div>
+</div>
+
+<script>
+    var jl_start_synchronisation = function() {
+        var req = new Ajax.Request("<?php echo $urlModel->getUrl('adminhtml/janolaw_status/runSynchronisation');; ?>", {
+            "method": "post",
+            onSuccess: function(response) {
+                var result = response.responseText.evalJSON();
+                if (result.success) {
+                    alert("<?php echo $this->__('Success'); ?>");
+                } else if (result.messages) {
+                    var msg = '';
+                    if (result.messages instanceof Array) {
+                        msg = result.messages.length + " errors";
+                    } else {
+                        msg = result.messages;
+                    }
+                    alert(msg);
+                }
+                // reload to update status information
+                window.location.reload();
+            },
+            onFailure: function(response) {
+                alert("<?php echo $this->__('Failure'); ?>");
+                // reload to update status information
+                window.location.reload();
+            }
+        });
+    }
+</script>

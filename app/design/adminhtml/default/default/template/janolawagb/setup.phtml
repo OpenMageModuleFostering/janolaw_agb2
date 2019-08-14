@@ -1,0 +1,554 @@
+<?php
+/* @var $this Janolaw_Agb_Block_Adminhtml_Setup */
+?>
+
+<?php
+$isInstalledGermanSetup = Mage::helper('core')->isModuleEnabled('FireGento_GermanSetup');
+$isInstalledMageSetup = Mage::helper('core')->isModuleEnabled('FireGento_MageSetup');
+
+// $mrg modules
+// $installedMrgModules = $this->getInstalledMrgModules();
+$isInstalledSymmetricsAgreement = Mage::helper('core')->isModuleEnabled('Symmetrics_Agreement');
+
+/* @var $urlModel Mage_Adminhtml_Model_Url */
+$urlModel = Mage::getModel('adminhtml/url');
+$linkSysConfig = $urlModel->getUrl('adminhtml/system_config/edit', array('section' => 'agbdownload'));
+$staticBlockUrl = $urlModel->getUrl('adminhtml/cms_block/index');
+$cmsPageUrl = $urlModel->getUrl('adminhtml/cms_page/index');
+$agreementsUrl = $urlModel->getUrl('adminhtml/checkout_agreement/index');
+
+/* @var $cmsAssistant Janolaw_Agb_Model_CmsAssistant */
+$cmsAssistant = Mage::getSingleton('agbdownloader/cmsAssistant');
+$blockCandidates = $cmsAssistant->getBlockCandidates();
+
+$actionSetBlockId = $urlModel->getUrl('adminhtml/janolaw_setup/setBlockIdentifier');
+$actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement');
+?>
+
+<div class="content-header">
+    <h3>Janolaw AGB Hosting - Setup</h3>
+
+    <p class="form-buttons"></p>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Kurzinfo</h4>
+    </div>
+    <div class="fieldset">
+        <p>
+            <b>Neuinstallation</b><br />
+            Falls Sie dieses Modul gerade installiert haben, lesen Sie die folgenden Informationen bitte durch.
+            Folgen Sie den Anweisungen, um Ihr System korrekt zu konfigurieren.
+        </p>
+        <p>
+            <b>Update</b><br />
+            Wenn Sie bereits eine ältere Version des Moduls installiert hatten, ist vermutlich das meiste bereits
+            korrekt konfiguriert. Insbesondere bei der CMS-Konfiguration haben wir jedoch <b>Änderungen</b>
+            durchgeführt, die Sie beachten sollten:
+        </p>
+        <ul style="margin-left: 1.5em; list-style-type: disc;">
+            <li>
+                Wir haben die Möglichkeit entfernt, Janolaw-Texte direkt in CMS-Seiten zu speichern. Falls Sie diese
+                Option genutzt haben, sollten Sie nun für den betreffenden Text einen CMS-Block definieren und das Snippet
+                für diesen Block in die CMS-Seite einbinden (Details: Schritte 2 und 3).
+            </li>
+        </ul>
+        <p>
+            Im Allgemeinen empfiehlt es sich, die hier beschriebenen Schritte nochmals durchzulesen und die Konfiguration
+            überprüfen.
+        </p>
+    </div>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 1: Lokalisierungs-Modul installieren (optional)</h4>
+    </div>
+    <div class="fieldset">
+        <?php if ($isInstalledMageSetup): ?>
+        <p>
+            Auf Ihrem System ist bereits das Modul <b>FireGento_MageSetup</b> installiert. Diese arbeitet optimal mit
+            dem Janolaw Modul zusammen.
+        </p>
+        <?php elseif ($isInstalledGermanSetup): ?>
+        <p>
+            Auf Ihrem System ist bereits das Modul <b>FireGento_GermanSetup</b> installiert. Diese arbeitet optimal mit
+            dem Janolaw Modul zusammen.
+        </p>
+        <?php elseif ($isInstalledSymmetricsAgreement): ?>
+        <p>
+            Auf Ihrem System ist bereits das Modul <b>Symmetrics_Agreement</b> (als Teil der Modulsammlung Market
+            Ready Germany) installiert. Diese arbeitet optimal mit dem Janolaw Modul zusammen.
+        </p>
+        <?php else: ?>
+        <p>
+            Auf Ihrem System ist kein (bekanntes) Modul installiert, das die Einbindung von den AGB und
+            Widerruf-Texten in den Checkout-Prozess vornimmt. Wir empfehlen dazu das Modul
+            <a href="http://www.magentocommerce.com/magento-connect/firegento-magesetup.html">MageSetup von FireGento</a>.
+            Falls Sie dieses Modul installieren wollen, installieren <b>und initialisieren</b> Sie dieses Modul bitte
+            <b>bevor</b> Sie mit diesem Setup weiterfahren (beachten Sie dazu die Hinweise des Anbieters).
+            Sie erreichen diese Setup-Seite anschließend wieder über den Menü-Punkt System -&gt; Janolaw AGB Hosting
+            -&gt; Setup.
+            Alternativ können Sie das Janolaw Modul auch standalone nutzen.
+        </p>
+        <?php endif; ?>
+    </div>
+</div>
+
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 2a: Konfiguration - Speicher-Definition (CMS-Blöcke/-Seiten)</h4>
+    </div>
+    <div class="fieldset">
+        <p>
+            Für jeden Text (AGB, Widerrufsbelehrung, Impressum und Datenschutz) wird ein CMS-Block
+            benötigt. Wenn Sie eines der Module <i>FireGento_GermanSetup</i>, <i>FireGento_MageSetup</i>
+            oder <i>Symmetrics_Agreement</i> (von
+            Market Ready Germany) installiert haben (vgl. Schritt 1), exisitieren dazu vermutlich bereits Blöcke.
+        </p>
+        <p>
+            Nachfolgend haben wir Ihr System auf von oben erwähnten Modulen angelegte Blöcke durchsucht, die Sie verwenden
+            können. Wurden keine gefunden, oder wollen Sie die Janolaw-Texte in anderen CMS-Blöcken speichern, dann
+            können Sie auch selbst einen Bezeichner eingeben. Für den Bezeichner gelten dabei folgende Regeln:
+        </p>
+
+        <ul style="margin-left: 1.5em; list-style-type: disc;">
+            <li>Nur Buchstaben (klein oder gross, keine Umlaute oder Sonderzeichen), Zahlen oder Bindestriche (-) oder Unterstriche (_) verwenden</li>
+            <li>Der Wert muss mit einem Buchstaben beginnen.</li>
+        </ul>
+
+        <p>
+            Die Werte können Sie jederzeit in der
+            <a href="<?php echo $linkSysConfig; ?>" target="_blank">Janolaw-Systemkonfiguration</a> unter <i>Storage definitions</i>
+            einsehen und ändern. Bedenken Sie, dass der Inhalt existierender Blöcke mit den hier definierten Bezeichnern
+            überschrieben werden. Sie können alle in Ihrem System existierenden Blöcke unter dem Menü-Punkt
+            <a href="<?php echo $staticBlockUrl; ?>" target="_blank">Statische Blöcke</a> einsehen.
+        </p>
+
+        <!-- AGB -->
+        <br />
+        <b>CMS-Block zur Speicherung der AGB</b>
+
+        <?php
+        $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_TAC_ID, 0);
+        ?>
+        <?php if ($currentValue): ?>
+        <p>
+            Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
+            Sie können den Wert so belassen oder ihn ändern.
+        </p>
+        <?php endif; ?>
+
+        <?php $blocks = $blockCandidates[Janolaw_Agb_Model_CmsAssistant::TYPE_TAC]; ?>
+        <?php if (empty($blocks)): ?>
+            <p>Es wurden keine passenden Blöcke gefunden.</p>
+        <?php else: ?>
+            <p>Es wurden folgende Blöcke gefunden, die wahrscheinlich zur Speicherung der AGB dienen:</p>
+            <ul style="margin-left: 1.5em; list-style-type: disc;">
+                <?php foreach ($blocks as $bCandidate => $isActive): ?>
+                    <li>
+                        <?php
+                        echo $bCandidate;
+                        if (!$isActive) echo ' (aktuell nicht aktiviert)';
+                        ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form method="post" id="form_block_id_tac" action="<?php echo $actionSetBlockId; ?>" onsubmit="jlform.block_tac.submit()">
+            <label for="block_id_tac">Setzte Bezeichner für CMS-Block, in den die AGB-Texte gespeichert werden sollen (Kopieren Sie einen der oben vorgeschlagenen Blöcke oder wählen Sie einen eigenen Bezeichner):</label><br />
+            <input id="block_id_tac" name="block_identifier" class="validate-xml-identifier input-text" type="text" value="<?php echo $currentValue ?: ''?>"/>
+            <input type="hidden" name="type" value="<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_TAC; ?>"/>
+            <button>CMS-Block Bezeichner für AGB setzen</button>
+        </form>
+        <br />
+
+        <!-- Widerrufsbelehrung -->
+
+        <br />
+        <b>CMS-Block zur Speicherung der Widerrufsbelehrung</b>
+        <?php
+        $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_REVOCATION_ID, 0);
+        ?>
+        <?php if ($currentValue): ?>
+        <p>
+            Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
+            Sie können den Wert so belassen oder ihn ändern.
+        </p>
+        <?php endif; ?>
+
+        <?php $blocks = $blockCandidates[Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION]; ?>
+        <?php if (empty($blocks)): ?>
+            <p>Es wurden keine passenden Blöcke gefunden.</p>
+        <?php else: ?>
+            <p>Es wurden folgende Blöcke gefunden, die wahrscheinlich zur Speicherung der Widerrufsbelehrung dienen:</p>
+            <ul style="margin-left: 1.5em; list-style-type: disc;">
+                <?php foreach ($blocks as $bCandidate => $isActive): ?>
+                    <li>
+                        <?php
+                        echo $bCandidate;
+                        if (!$isActive) echo ' (aktuell nicht aktiviert)';
+                        ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form method="post" id="form_block_id_revocation" action="<?php echo $actionSetBlockId; ?>" onsubmit="jlform.block_revocation.submit()">
+            <label for="block_id_revocation">Setzte Bezeichner für CMS-Block, in den die Widerrufsbelehrungs-Texte gespeichert werden sollen (Kopieren Sie einen der oben vorgeschlagenen Blöcke oder wählen Sie einen eigenen Bezeichner):</label><br />
+            <input id="block_id_revocation" name="block_identifier" class="validate-xml-identifier input-text" type="text" value="<?php echo $currentValue ?: ''?>"/>
+            <input type="hidden" name="type" value="<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION; ?>"/>
+            <button>CMS-Block Bezeichner für Widerrufsbelehrung setzen</button><br />
+        </form>
+
+        <!-- Datenschutz -->
+
+        <br />
+        <b>CMS-Block zur Speicherung der Datenschutzbestimmungen</b>
+        <?php
+        $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_PRIVACY_ID, 0);
+        ?>
+        <?php if ($currentValue): ?>
+            <p>
+                Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
+                Sie können den Wert so belassen oder ihn ändern.
+            </p>
+        <?php endif; ?>
+
+        <?php $blocks = $blockCandidates[Janolaw_Agb_Model_CmsAssistant::TYPE_PRIVACY]; ?>
+        <?php if (empty($blocks)): ?>
+            <p>Es wurden keine passenden Blöcke gefunden.</p>
+        <?php else: ?>
+            <p>Es wurden folgende Blöcke gefunden, die wahrscheinlich zur Speicherung der Datenschutzbestimmungen dienen:</p>
+            <ul style="margin-left: 1.5em; list-style-type: disc;">
+                <?php foreach ($blocks as $bCandidate => $isActive): ?>
+                    <li>
+                        <?php
+                        echo $bCandidate;
+                        if (!$isActive) echo ' (aktuell nicht aktiviert)';
+                        ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form method="post" id="form_block_id_privacy" action="<?php echo $actionSetBlockId; ?>" onsubmit="jlform.block_privacy.submit()">
+            <label for="block_id_privacy">Setzte Bezeichner für CMS-Block, in den die Datenschutzbestimmungen gespeichert werden sollen (Kopieren Sie einen der oben vorgeschlagenen Blöcke oder wählen Sie einen eigenen Bezeichner):</label><br />
+            <input id="block_id_privacy" name="block_identifier" class="validate-xml-identifier input-text" type="text" value="<?php echo $currentValue ?: ''?>"/>
+            <input type="hidden" name="type" value="<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_PRIVACY; ?>"/>
+            <button>CMS-Block Bezeichner für Datenschutzbestimmungen setzen</button><br />
+        </form>
+
+        <!-- Impressum -->
+
+        <br />
+        <b>CMS-Block zur Speicherung des Impressums</b>
+        <?php
+        $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_IMPRINT_ID, 0);
+        ?>
+        <?php if ($currentValue): ?>
+            <p>
+                Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
+                Sie können den Wert so belassen oder ihn ändern.
+            </p>
+        <?php endif; ?>
+
+        <?php $blocks = $blockCandidates[Janolaw_Agb_Model_CmsAssistant::TYPE_IMPRINT]; ?>
+        <?php if (empty($blocks)): ?>
+            <p>Es wurden keine passenden Blöcke gefunden.</p>
+        <?php else: ?>
+            <p>Es wurden folgende Blöcke gefunden, die wahrscheinlich zur Speicherung des Impressums dienen:</p>
+            <ul style="margin-left: 1.5em; list-style-type: disc;">
+                <?php foreach ($blocks as $bCandidate => $isActive): ?>
+                    <li>
+                        <?php
+                        echo $bCandidate;
+                        if (!$isActive) echo ' (aktuell nicht aktiviert)';
+                        ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form method="post" id="form_block_id_imprint" action="<?php echo $actionSetBlockId; ?>" onsubmit="jlform.block_imprint.submit()">
+            <label for="block_id_imprint">Setzte Bezeichner für CMS-Block, in den das Impressum gespeichert werden soll (Kopieren Sie einen der oben vorgeschlagenen Blöcke oder wählen Sie einen eigenen Bezeichner):</label><br />
+            <input id="block_id_imprint" name="block_identifier" class="validate-xml-identifier input-text" type="text" value="<?php echo $currentValue ?: ''?>"/>
+            <input type="hidden" name="type" value="<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_IMPRINT; ?>"/>
+            <button>CMS-Block Bezeichner für Impressum setzen</button><br />
+        </form>
+    </div>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 2b: Konfiguration - Zugangsdaten Janolaw</h4>
+    </div>
+    <div class="fieldset">
+        <p>
+            Gehen Sie zur <a href="<?php echo $linkSysConfig; ?>" target="_blank">Janolaw-Systemkonfiguration</a> und tragen Sie dort
+            unter <i>Userdaten</i> Ihre Zugangsdaten ein (die Sie von Janolaw Hosting bekommen haben). Als <i>API base url</i>
+            können Sie im Normalfall den konfigurierten Wert (http://www.janolaw.de/agb-service/shops) bestehen lassen.
+        </p>
+        <p>
+            Tipp: Sie können auch mit dem Scope-Selector arbeiten. So können Sie beispielsweise für verschiedene Stores
+            unterschiedliche Janolaw-Userdaten angeben und damit Store-spezifische Texte laden. Dieses Modul legt für
+            jeden Store einen eigenen Block an (die jedoch alle den gleichen <i>Bezeichner</i> haben).
+        </p>
+    </div>
+</div>
+
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 3: Blöcke in Seiten einbinden</h4>
+    </div>
+    <div class="fieldset">
+        <p>
+            In der Regel sollen alle vier Texte als CMS-Seite in Ihrem Shop angezeigt werden. Dazu müssen CMS-Seiten
+            erstellt werden (wenn sie nicht bereits existieren) und die oben konfigurierten CMS-Blöcke eingebunden
+            werden.
+        </p>
+        <p>
+            Als ersten Schritt müssen Sie dazu herausfinden, welche Seiten bereits existieren. Die schon erwähnten Module
+            <i>FireGento_GermanSetup</i>, <i>FireGento_MageSetup</i>
+            und <i>Market Ready Germany</i> legen bereits einige dieser Seiten an, das Modul <i>MageSetup</i> sogar
+            gegebenenfalls in mehreren Sprachen. Vielleicht haben Sie auch selbst schon Seiten zu diesem Zweck angelegt.
+        </p>
+        <p>
+            Jetzt <a href="<?php echo $cmsPageUrl; ?>" target="_blank">CMS-Seiten öffnen</a>.
+        </p>
+        <p>
+            Tragen Sie anschließend &mdash; falls noch nicht vorhanden &mdash; folgende Snippets in die Seiten ein.
+            Damit werden die CMS-Blöcke &quot;inkludiert&quot;. Falls Sie für verschiedene Stores unterschiedliche
+            CMS-Seiten verwenden, fügen Sie die Snippets in alle Seiten ein (es kann jeweils das gleiche Snippet verwendet
+            werden, über den Bezeichner wird automatisch der CMS-Block des entsprechenden Stores verwendet).<br />
+        </p>
+        <ul style="margin-left: 1.5em; list-style-type: disc;">
+            <li>
+                Die Snippets basieren auf den Einstellungen aus Schritt 2. Falls Sie die dort erwähnte Konfiguration
+                vollständig abgeschlossen haben, und dennoch die Meldung von nicht definierten CMS-Blöcken erhalten,
+                dann laden Sie die Seite bitte neu.
+            </li>
+            <li>
+                Um die Snippets in die CMS-Seiten einzufügen, müssen Sie die Seiten im Raw-Editor-Modus bearbeiten.
+                Klicken Sie dafür den Button <i>Editor anzeigen/ausblenden</i>. Wenn Sie keine Text-Formatierungs-Buttons
+                mehr sehen, sind Sie im Raw-Modus.
+            </li>
+        </ul>
+
+        <br />
+        <b>Snippet zur Einbindung des AGB Blocks:</b>
+        <?php $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_TAC_ID, 0); ?>
+
+        <?php if ($currentValue): ?>
+            <pre><?php echo $cmsAssistant->getCmsDirectiveSnippet($currentValue); ?></pre>
+        <?php else: ?>
+            <p>
+                Es wurde noch kein CMS-Block zur Speicherung der AGB-Texte definiert. (Bitte befolgen Sie die Anweisungen
+                aus Schritt 2).
+            </p>
+        <?php endif; ?>
+
+        <br />
+        <b>Snippet zur Einbindung der Widerrufsbelehrung:</b>
+        <?php $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_REVOCATION_ID, 0); ?>
+
+        <?php if ($currentValue): ?>
+            <pre><?php echo $cmsAssistant->getCmsDirectiveSnippet($currentValue); ?></pre>
+        <?php else: ?>
+            <p>
+                Es wurde noch kein CMS-Block zur Speicherung der Widerrufsbelehrung definiert. (Bitte befolgen Sie die
+                Anweisungen
+                aus Schritt 2).
+            </p>
+        <?php endif; ?>
+
+        <br />
+        <b>Snippet zur Einbindung der Datenschutzbestimmungen:</b>
+        <?php $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_PRIVACY_ID, 0); ?>
+        <?php if ($currentValue): ?>
+            <pre><?php echo $cmsAssistant->getCmsDirectiveSnippet($currentValue); ?></pre>
+        <?php else: ?>
+            <p>
+            Es wurde noch kein CMS-Block zur Speicherung der Datenschutzbestimmungen definiert. (Bitte befolgen Sie die Anweisungen
+            aus Schritt 2).
+            </p>
+        <?php endif; ?>
+
+        <br />
+        <b>Snippet zur Einbindung des Impressum Blocks:</b>
+        <?php $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_IMPRINT_ID, 0); ?>
+        <?php if ($currentValue): ?>
+            <pre><?php echo $cmsAssistant->getCmsDirectiveSnippet($currentValue); ?></pre>
+        <?php else: ?>
+            <p>
+                Es wurde noch kein CMS-Block zur Speicherung des Impressums definiert. (Bitte befolgen Sie die Anweisungen
+                aus Schritt 2).
+            </p>
+        <?php endif; ?>
+
+        <br />
+        <p>
+            Nun sollten Sie sicherstellen, dass die angelegten Seiten verlinkt werden. Meistens
+            nutzt man dafür den Footer. In einem neu installierten Magento gibt es bereits einen
+            CMS-Block mit dem Bezeichner
+            &quot;footer_links&quot; (bzw. &quot;footer_links_company&quot; ab v1.9), bei dem Sie
+            Links zu den neu angelegten Seiten definieren können.
+        </p>
+    </div>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 4: Agreements erstellen</h4>
+    </div>
+    <div class="fieldset">
+        <p>
+            Unter <a href="<?php echo $agreementsUrl; ?>" target="_blank">Agreements (Bestellbedingungen)</a>
+            finden Sie alle bereits definierten Bestellbedingungen. Wenn Sie eines der Module von
+            <i>FireGento</i> und <i>Market Ready Germany</i> installiert (und initialisiert) haben, dann wurden
+            dort vermutlich schon Bedingungen für AGB und Widerrufsbelehrung angelegt. Kontrollieren Sie bitte folgende
+            Punkte:
+        </p>
+        <ul style="margin-left: 1.5em; list-style-type: disc;">
+            <li>
+                Existieren Bedingungen für AGB und Widerrufsbelehrung? Wenn nicht, empfehlen wir, diese noch anzulegen
+                (über den Button &quot;Neue Bedingung&quot;, den Sie oben rechts finden).
+            </li>
+            <li>
+                Sind die Bedingungen aktiviert (Feld <i>Status</i>) und sind sie den entsprechenden Stores zugewiesen
+                (Feld <i>StoreView</i>)?
+            </li>
+            <li>
+                Sind im Feld <i>Inhalt</i> die korrekten Blöcke eingebunden? Wenn nicht, können Sie die Snippets
+                aus Schritt 3 (Blöcke in Seiten einbinden) verwenden, um die AGB bzw. Widerrufsbelehrung einzubinden.
+            </li>
+        </ul>
+
+        <br />
+        <p>
+            Alternativ können Sie auch folgende Buttons nutzen, um komplett neue Bestellbedingungen mit den von
+            Ihnen konfigurierten Blöcken automatisch anzulegen. Sie können die Bedinungen nach Bedarf unter
+            <a href="<?php echo $agreementsUrl; ?>" target="_blank">Agreements (Bestellbedingungen)</a>
+            nach Belieben anpassen.
+        </p>
+        <p>
+            <button onclick="jlform.createAgreement('<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_TAC; ?>')">AGB Bestellbedingung anlegen</button>
+        </p>
+        <p>
+            <button onclick="jlform.createAgreement('<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION; ?>')">Widerrufsbelehrung Bestellbedingung anlegen</button>
+        </p>
+        <p>
+            Damit die Bestellbedingungen im Checkout auch angezeigt werden, muss noch eine Konfigurationseinstellung
+            berücksichtigt werden:<br />
+            Unter <a href="<?php echo $urlModel->getUrl('adminhtml/system_config/edit', array('section' => 'checkout')); ?>" target="_blank">Checkout</a>
+            muss die Option <i>Bestellbedingungen aktivieren</i> aktiviert werden.
+        </p>
+    </div>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 5: E-Mail Templates bearbeiten (optional)</h4>
+    </div>
+    <div class="fieldset">
+        <p>
+            <?php $salesEmailUrl = $urlModel->getUrl('adminhtml/system_config/edit', array('section' => 'sales_email')); ?>
+            <?php $editEmails = $urlModel->getUrl('adminhtml/system_email_template'); ?>
+
+            Unter <a href="<?php echo $salesEmailUrl; ?>" target="_blank">Verkaufs-E-Mails</a> finden Sie die aktuell konfigurierten
+            E-Mail Templates. Merken Sie sich, welche E-Mails dort als Vorlagen konfiguriert sind.
+        </p>
+        <p>
+            Sie können diese Templates nun unter <a href="<?php echo $editEmails; ?>" target="_blank">Transaktions-E-Mails</a>
+            anpassen. Wenn in der Verkauf-E-Mails-Konfiguration der Hinweis &quot;(Standard-Vorlage aus Lokalisierung)&quot; steht,
+            dann müssen Sie erst ein neues Template anlegen (Button &quot;Neue Vorlage&quot; oben rechts bei den
+            <a href="<?php echo $editEmails; ?>" target="_blank">Transaktions-E-Mails</a>)
+            und dieses anschließend in der Konfiguration auswählen.
+        </p>
+        <p>
+            Um z.&nbsp;B. den AGB-Text in das E-mail einzufügen, kopieren Sie das entsprechende Block-Snippet aus
+            Schritt 3 an die gewünschte Stelle in der E-Mail-Vorlage.
+        </p>
+    </div>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 6: Erste Synchronisation durchführen</h4>
+    </div>
+    <div class="fieldset">
+        <?php $statusUrl = $urlModel->getUrl('adminhtml/janolaw_status'); ?>
+        <p>
+            Wenn Sie alles konfiguriert haben, können Sie nun auf der
+            <a href="<?php echo $statusUrl; ?>">Status-Seite von Janolaw</a> die erste
+            Synchronisation durchführen.
+        </p>
+    </div>
+</div>
+
+<div class="entry-edit" style="max-width: 800px;">
+    <div class="entry-edit-head">
+        <h4>Schritt 7: Cronjob</h4>
+    </div>
+    <div class="fieldset">
+        Die Texte werden automatisch alle 2 Stunden synchronisiert. Voraussetzung dazu ist jedoch, dass die Cronjobs
+        in Ihrem System korrekt konfiguriert sind. Falls das bei Ihrem Magento-System nicht der Fall sein sollte, wenden Sie
+        sich bitte an Ihren Administrator.
+    </div>
+</div>
+
+<script>
+    var jlform = {};
+    jlform.block_tac = new varienForm("form_block_id_tac", "");
+    jlform.block_revocation = new varienForm("form_block_id_revocation", "");
+    jlform.block_privacy = new varienForm("form_block_id_privacy", "");
+    jlform.block_imprint = new varienForm("form_block_id_imprint", "");
+    document.observe("dom:loaded", function() {
+        var jlform_fkey = new Element("input", {
+            "type" : "hidden",
+            "name" : "form_key",
+            "value" : FORM_KEY
+        });
+        document.getElementById("form_block_id_tac").insert(jlform_fkey.clone());
+        document.getElementById("form_block_id_revocation").insert(jlform_fkey.clone());
+        document.getElementById("form_block_id_privacy").insert(jlform_fkey.clone());
+        document.getElementById("form_block_id_imprint").insert(jlform_fkey.clone());
+    });
+
+    jlform.createAgreement = function(agreement_type) {
+        var data = {};
+        if (agreement_type == "<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_TAC; ?>") {
+            data.name = "AGB";
+            data.type = agreement_type;
+        } else if (agreement_type == "<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION; ?>") {
+            data.name = "Widerrufsbelehrung";
+            data.type = agreement_type;
+        } else {
+            alert("Konnte Bestellbedingung nicht speichern (unbekannter Typ)");
+            return;
+        }
+        data.overwrite = ""; // note setting to false sends a string parameter "false" which is evaluated as true in php
+        data.is_ajax = 1;
+        var req = new Ajax.Request("<?php echo $actionSaveAgreement; ?>", {
+            "method": "post",
+            "parameters": data,
+            onSuccess: function(response) {
+                var result = response.responseText.evalJSON();
+                if (result.message) {
+                    alert(result.message);
+                } else {
+                    alert("Ein Fehler ist aufgetreten");
+                }
+            },
+            onFailure: function(response) {
+                alert("Ein Fehler ist aufgetreten");
+            }
+        });
+    }
+
+</script>
+

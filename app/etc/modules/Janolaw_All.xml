@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- This file can also be deleted if you like... (e.g. if it conflicts with another package
+     from Janolaw). We keep the file in the repository to ensure
+     backwards compatibility, as older versions of Janolaw_Agb had the module
+     Janolaw_Agb defined in this file (so we need to overwrite it to prevent inconsistency) -->
+<config/>

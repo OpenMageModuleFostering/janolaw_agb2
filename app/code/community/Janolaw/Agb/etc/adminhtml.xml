@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <menu>
+        <system>
+            <children>
+                <janolaw translate="title">
+                    <title>Janolaw AGB Hosting</title>
+                    <sort_order>0</sort_order>
+                    <children>
+                        <setup>
+                            <title>Setup</title>
+                            <action>adminhtml/janolaw_setup</action>
+                            <sort_order>10</sort_order>
+                        </setup>
+                        <status>
+                            <title>Status</title>
+                            <action>adminhtml/janolaw_status</action>
+                            <sort_order>20</sort_order>
+                        </status>
+                    </children>
+                </janolaw>
+            </children>
+        </system>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <agbdownload>
+                                        <title>janolaw AGB-Hosting</title>
+                                        <sort_order>905</sort_order>
+                                    </agbdownload>
+                                </children>
+                            </config>
+                            <janolaw translate="title">
+                                <title>Janolaw AGB</title>
+                                <sort_order>10</sort_order>
+                            </janolaw>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

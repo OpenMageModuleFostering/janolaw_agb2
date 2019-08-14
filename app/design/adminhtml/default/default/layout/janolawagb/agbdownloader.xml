@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout version="0.1.0">
+    <adminhtml_janolaw_setup_index>
+        <reference name="content">
+            <block type="agbdownloader/adminhtml_setup" name="janolaw.setup" template="janolawagb/setup.phtml"/>
+        </reference>
+    </adminhtml_janolaw_setup_index>
+
+    <adminhtml_janolaw_status_index>
+        <reference name="content">
+            <block type="agbdownloader/adminhtml_status_config" name="janolaw.status.config" template="janolawagb/status/config.phtml"/>
+        </reference>
+    </adminhtml_janolaw_status_index>
+</layout>

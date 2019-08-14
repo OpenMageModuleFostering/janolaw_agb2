@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <modules>
+        <Janolaw_Agb>
+            <version>0.1.6</version>
+        </Janolaw_Agb>
+    </modules>
+    <global>
+        <models>
+            <agbdownloader>
+                <class>Janolaw_Agb_Model</class>
+                <resourceModel>agbdownloader_resource</resourceModel>
+            </agbdownloader>
+            <agbdownloader_resource>
+                <class>Janolaw_Agb_Model_Resource</class>
+            </agbdownloader_resource>
+            <core>
+                <rewrite>
+                    <email_template>Janolaw_Agb_Model_Email_Template</email_template>
+                </rewrite>
+            </core>
+        </models>
+        <helpers>
+            <agbdownloader>
+                <class>Janolaw_Agb_Helper</class>
+            </agbdownloader>
+        </helpers>
+        <blocks>
+            <agbdownloader>
+                <class>Janolaw_Agb_Block</class>
+            </agbdownloader>
+        </blocks>
+        <resources>
+            <agb_setup>
+                <setup>
+                    <module>Janolaw_Agb</module>
+                    <class>Janolaw_Agb_Model_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </agb_setup>
+        </resources>
+        <events>
+            <!-- we do not support pdf attachments yet, but will probably do so later.. -->
+            <!--
+            <janolaw_send_transactional_before>
+                <observers>
+                    <neworder_add_attachement>
+                        <class>agbdownloader/observer</class>
+                        <method>addAttachmentToNewOrderEmail</method>
+                    </neworder_add_attachement>
+                </observers>
+            </janolaw_send_transactional_before>
+            -->
+        </events>
+    </global>
+
+    <adminhtml>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <agbdownload>
+                                            <title>janolaw AGB-Hosting</title>
+                                            <sort_order>905</sort_order>
+                                        </agbdownload>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <agbdownloader>
+                    <file>janolawagb/agbdownloader.xml</file>
+                </agbdownloader>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Janolaw_Agb>
+                    <files>
+                        <default>Janolaw_Agb.csv</default>
+                    </files>
+                </Janolaw_Agb>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Janolaw_Agb before="Mage_Adminhtml">Janolaw_Agb_Adminhtml</Janolaw_Agb>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <frontend>
+        <events>
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <germansetup_observer>
+                        <class>agbdownloader/observer</class>
+                        <method>filterAgreements</method>
+                    </germansetup_observer>
+                </observers>
+            </core_block_abstract_to_html_before>
+        </events>
+    </frontend>
+
+    <default>
+        <agbdownload>
+            <janoloaw_agb_user>
+                <api_base_url><![CDATA[http://www.janolaw.de/agb-service/shops]]></api_base_url>
+            </janoloaw_agb_user>
+            <janoloaw_agb_cms>
+                <agbid></agbid> <!-- empty values prevent the system from creating or overwriting any pages/blocks, so we use that as default... -->
+                <impressumid></impressumid>
+                <wiederrufid></wiederrufid>
+                <datenschutzid></datenschutzid>
+            </janoloaw_agb_cms>
+        </agbdownload>
+    </default>
+
+    <crontab>
+        <jobs>
+            <janolaw_import_all>
+                <schedule>
+                    <!-- every second hour -->
+                    <cron_expr>* */2 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>agbdownloader/downloader::download</model>
+                </run>
+            </janolaw_import_all>
+        </jobs>
+    </crontab>
+</config>
