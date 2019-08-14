@@ -1,6 +1,6 @@
 <?php
 
-class Janolaw_Agb_Model_Email_Queue extends Mage_Core_Model_Email_Queue
+class Janolaw_Agb_Model_Email_Queue extends Janolaw_Agb_Model_Email_Queue_Compatibility
 {
 
     /**
@@ -11,12 +11,25 @@ class Janolaw_Agb_Model_Email_Queue extends Mage_Core_Model_Email_Queue
      */
     public function send()
     {
+        //Use Aschroder_SMTPPro :: send events
+        if(Mage::helper('core')->isModuleEnabled('Aschroder_SMTPPro')
+            && Mage::helper('smtppro')->isEnabled()
+            && version_compare(
+                (string)Mage::getConfig()->getNode()->modules->Aschroder_SMTPPro->version,
+                '2.0.6', '>'
+            )
+        ) {
+            return parent::send();
+        }
+
+        //Rewrite Core :: send
         /** @var $collection Mage_Core_Model_Resource_Email_Queue_Collection */
         $collection = Mage::getModel('core/email_queue')->getCollection()
             ->addOnlyForSendingFilter()
             ->setPageSize(self::MESSAGES_LIMIT_PER_CRON_RUN)
             ->setCurPage(1)
             ->load();
+
 
         ini_set('SMTP', Mage::getStoreConfig('system/smtp/host'));
         ini_set('smtp_port', Mage::getStoreConfig('system/smtp/port'));
@@ -31,18 +44,6 @@ class Janolaw_Agb_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                 }
 
                 $mailer = new Zend_Mail('utf-8');
-
-                //Begin
-                //Added event before sending
-                Mage::dispatchEvent(
-                    'janolaw_send_queue_before',
-                    array(
-                        'mailer' => $mailer,
-                        'message' => $message,
-                    )
-                );
-                //End
-
                 foreach ($message->getRecipients() as $recipient) {
                     list($email, $name, $type) = $recipient;
                     switch ($type) {
@@ -73,6 +74,17 @@ class Janolaw_Agb_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                 }
 
                 try {
+                    //Begin
+                    //Added event before sending
+                    Mage::dispatchEvent(
+                        'janolaw_send_queue_before',
+                        array(
+                            'mail' => $mailer,
+                            'message' => $message,
+                        )
+                    );
+                    //End
+
                     $mailer->send();
                     unset($mailer);
                     $message->setProcessedAt(Varien_Date::formatDate(true));

@@ -27,6 +27,7 @@ class Janolaw_Agb_Model_Observer extends Mage_Core_Model_Abstract
      */
     protected $_attachedPdfTypes = array(
         \Janolaw_Agb_Model_CmsAssistant::TYPE_TAC => 'agbdownload/janoloaw_agb_pdf/agb',
+        \Janolaw_Agb_Model_CmsAssistant::TYPE_PRIVACY => 'agbdownload/janoloaw_agb_pdf/datasecurity',
         \Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION => 'agbdownload/janoloaw_agb_pdf/wiederruf',
         \Janolaw_Agb_Model_CmsAssistant::TYPE_WITHDRAWAL => 'agbdownload/janoloaw_agb_pdf/withdrawal'
     );
@@ -113,7 +114,7 @@ class Janolaw_Agb_Model_Observer extends Mage_Core_Model_Abstract
         /** @var Janolaw_Agb_Model_Email_Queue $message */
         $message = $observer->getData('message');
         /** @var Zend_Mail $mailer */
-        $mailer = $observer->getData('mailer');
+        $mailer = $observer->getData('mail');
 
         if($message
             && $message->getData('event_type')

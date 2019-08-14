@@ -600,7 +600,12 @@ $_withdrawalFormAvailable = (bool) Mage::getSingleton('agbdownloader/downloader'
     }
 
     jlform.defaultAjaxSuccessHandler = function(response) {
-        var result = response.responseText.evalJSON();
+        var result;
+        try {
+            result = response.responseText.evalJSON();
+        } catch (e) {
+            result = {}; // will trigger an error alert...
+        }
         if (result.message) {
             alert(result.message);
         } else {

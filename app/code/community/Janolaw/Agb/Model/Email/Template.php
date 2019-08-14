@@ -1,6 +1,6 @@
 <?php
 
-class Janolaw_Agb_Model_Email_Template extends Mage_Core_Model_Email_Template
+class Janolaw_Agb_Model_Email_Template extends Janolaw_Agb_Model_Email_Template_Compatibility
 {
 
     public function sendTransactional($templateId, $sender, $email, $name, $vars=array(), $storeId=null)

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Janolaw_Agb>
-            <version>0.2.6</version>
+            <version>0.3.1</version>
         </Janolaw_Agb>
     </modules>
     <global>
@@ -62,6 +62,17 @@
                     </neworder_add_attachement>
                 </observers>
             </janolaw_send_queue_before>
+
+            <!-- pdf attachments to queue email (since magento CE 1.9.1)-->
+            <!-- called by aschroder_smtppro module -->
+            <aschroder_smtppro_queue_before_send>
+                <observers>
+                    <neworder_add_attachement>
+                        <class>agbdownloader/observer</class>
+                        <method>addAttachmentQueueEmail</method>
+                    </neworder_add_attachement>
+                </observers>
+            </aschroder_smtppro_queue_before_send>
         </events>
     </global>
 
