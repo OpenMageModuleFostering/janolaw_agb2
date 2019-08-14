@@ -3,10 +3,33 @@
 
 class Janolaw_Agb_Model_Observer extends Mage_Core_Model_Abstract
 {
+    /**
+     * Array with allowed email templates where pdf documents would be attached
+     * @var array
+     */
+    protected $_allowedEmailTemplateWithAttachment = array(
+        \Mage_Sales_Model_Order::XML_PATH_EMAIL_GUEST_TEMPLATE,
+        \Mage_Sales_Model_Order::XML_PATH_EMAIL_TEMPLATE
+    );
 
-    const XML_PATH_ATTACHMENT_TAC = 'sales_email/order/include_tac_pdf';
+    /**
+     * Array with allowed queue types where pdf documents would be attached
+     * \Mage_Sales_Model_Order::EMAIL_EVENT_TYPE
+     * @var array
+     */
+    protected $_allowedEmailQueueWithAttachment = array(
+        'new_order'
+    );
 
-    const XML_PATH_ATTACHMENT_REVOCATION = 'sales_email/order/include_revocation_pdf';
+    /**
+     * Janolaw_Agb_Model_CmsAssistant::ITEM => system config path to enabled selectbox
+     * @var array
+     */
+    protected $_attachedPdfTypes = array(
+        \Janolaw_Agb_Model_CmsAssistant::TYPE_TAC => 'agbdownload/janoloaw_agb_pdf/agb',
+        \Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION => 'agbdownload/janoloaw_agb_pdf/wiederruf',
+        \Janolaw_Agb_Model_CmsAssistant::TYPE_WITHDRAWAL => 'agbdownload/janoloaw_agb_pdf/withdrawal'
+    );
 
     protected $_downloader;
 
@@ -63,51 +86,49 @@ class Janolaw_Agb_Model_Observer extends Mage_Core_Model_Abstract
      *
      * @param Varien_Event_Observer $observer
      */
-    public function addAttachmentToNewOrderEmail(Varien_Event_Observer $observer)
+    public function addAttachmentTransactionEmail(Varien_Event_Observer $observer)
     {
         $templateId = $observer->getData('template_id');
         $storeId = $observer->getData('store_id');
 
-        $newOrderTemplates = array(
-            Mage::getStoreConfig(\Mage_Sales_Model_Order::XML_PATH_EMAIL_GUEST_TEMPLATE, $storeId),
-            Mage::getStoreConfig(\Mage_Sales_Model_Order::XML_PATH_EMAIL_TEMPLATE, $storeId),
-        );
-        if (in_array($templateId, $newOrderTemplates)) {
+        if (in_array($templateId, $this->getAllowedEmailTemplateWithAttachment($storeId))) {
             $templateModel = $observer->getData('template_model');
-            $this->_addAttachment($templateModel, $storeId, self::XML_PATH_ATTACHMENT_TAC);
-            $this->_addAttachment($templateModel, $storeId, self::XML_PATH_ATTACHMENT_REVOCATION);
+            foreach($this->getAttachedPdfTypes($storeId) as $type => $configPath){
+                $pdfTitle = $this->_getDownloader()->getPdfTitleByType($type, $storeId).'.pdf';
+                $pdfPath = $this->_getDownloader()->getPdfPathByType($storeId, $type);
+
+                $this->_getHelper()->addAttachment($templateModel->getMail(), $pdfTitle, $pdfPath);
+            }
         }
     }
 
-    protected function _addAttachment(Mage_Core_Model_Email_Template $template, $storeId, $includeConfigPath)
+    /**
+     * event: janolaw_send_queue_before
+     * @see \Janolaw_Agb_Model_Email_Queue::send
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function addAttachmentQueueEmail(Varien_Event_Observer $observer)
     {
-        switch ($includeConfigPath) {
-            case self::XML_PATH_ATTACHMENT_TAC:
-                $type = Janolaw_Agb_Model_CmsAssistant::TYPE_TAC;
-                $attachmentFilename = $this->_getHelper()->__('Terms-and-conditions') . '.pdf';
-                break;
-            case self::XML_PATH_ATTACHMENT_REVOCATION:
-                $type = Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION;
-                $attachmentFilename = $this->_getHelper()->__('Revocation-policy') . '.pdf';
-                break;
-            default:
-                return;
-        }
-        if (Mage::getStoreConfigFlag($includeConfigPath, $storeId)) {
-            $pdfPath = $this->_getDownloader()->getPdfPathByType($storeId, $type);
-            if ($pdfPath) {
-                try {
-                    $pdf = Zend_Pdf::load($pdfPath);
-                    $template->getMail()->createAttachment(
-                        $pdf->render(),
-                        Zend_Mime::TYPE_OCTETSTREAM,
-                        Zend_Mime::DISPOSITION_ATTACHMENT,
-                        Zend_Mime::ENCODING_BASE64,
-                        $attachmentFilename
-                    );
-                } catch (Exception $e) {
-                    Mage::logException($e);
-                }
+        /** @var Janolaw_Agb_Model_Email_Queue $message */
+        $message = $observer->getData('message');
+        /** @var Zend_Mail $mailer */
+        $mailer = $observer->getData('mailer');
+
+        if($message
+            && $message->getData('event_type')
+            && $this->_validEmailQueueType($message->getData('event_type'))
+        ){
+            $storeId = $this->_storeIdByQueueObject(
+                $message->getData('entity_type'),
+                $message->getData('entity_id')
+            );
+
+            foreach($this->getAttachedPdfTypes($storeId) as $type => $configPath){
+                $pdfTitle = $this->_getDownloader()->getPdfTitleByType($type, $storeId).'.pdf';
+                $pdfPath = $this->_getDownloader()->getPdfPathByType($storeId, $type);
+
+                $this->_getHelper()->addAttachment($mailer, $pdfTitle, $pdfPath);
             }
         }
     }
@@ -123,8 +144,78 @@ class Janolaw_Agb_Model_Observer extends Mage_Core_Model_Abstract
         return $this->_downloader;
     }
 
+    /**
+     * @return Janolaw_Agb_Helper_Data
+     */
     protected function _getHelper()
     {
         return Mage::helper('agbdownloader');
+    }
+
+    /**
+     * get AllowedEmailTemplateWithAttachment
+     * @param $storeId
+     * @return array
+     */
+    public function getAllowedEmailTemplateWithAttachment($storeId){
+        $items = array();
+        foreach($this->_allowedEmailTemplateWithAttachment as $path){
+            $templateId = Mage::getStoreConfig($path, $storeId);
+            if($templateId) $items[] = $templateId;
+        }
+        return $items;
+    }
+
+    /**
+     * get AllowedEmailQueueWithAttachment
+     * @return array
+     */
+    public function getAllowedEmailQueueWithAttachment(){
+        return $this->_allowedEmailQueueWithAttachment;
+    }
+
+    /**
+     * get AttachedPdfTypes
+     * @param $storeId
+     * @return array
+     */
+    public function getAttachedPdfTypes($storeId){
+        $items = array();
+        foreach ($this->_attachedPdfTypes as $type => $configPathEnablePdfAttachment) {
+            if(Mage::getStoreConfigFlag($configPathEnablePdfAttachment, $storeId)) $items[$type] = $configPathEnablePdfAttachment;
+        }
+        return $items;
+    }
+
+    /**
+     * Check queue email type
+     * @param $event_type
+     * @return bool
+     */
+    private function _validEmailQueueType($event_type){
+        if(in_array($event_type, $this->getAllowedEmailQueueWithAttachment())) return true;
+        else return false;
+    }
+
+    /**
+     * @param $entity_type
+     * @param $entity_id
+     * @return int
+     */
+    private function _storeIdByQueueObject($entity_type, $entity_id){
+        $storeId = 0;
+
+        try {
+            switch($entity_type){
+                case 'order':
+                    $entity_id = intval($entity_id);
+                    $storeId = Mage::getModel('sales/order')->load($entity_id)->getStoreId();
+                    break;
+            }
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
+
+        return $storeId;
     }
 } 

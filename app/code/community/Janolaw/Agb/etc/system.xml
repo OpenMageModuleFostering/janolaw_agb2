@@ -1,37 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <sections>
-        <!-- currently we do not support pdf attachments... but do not delete, as we will support that later. -->
-        <!--
-        <sales_email>
-            <groups>
-                <order>
-                    <fields>
-                        <include_tac_pdf translate="label comment" module="agbdownloader">
-                            <label><![CDATA[Include T&C pdf as Attachment]]></label>
-                            <comment>Note that this only works if a pdf is available from janolaw</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>3</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </include_tac_pdf>
-                        <include_revocation_pdf translate="label comment" module="agbdownloader">
-                            <label><![CDATA[Include revocation pdf as Attachment]]></label>
-                            <comment>Note that this only works if a pdf is available from janolaw</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>3</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </include_revocation_pdf>
-                    </fields>
-                </order>
-            </groups>
-        </sales_email>
-        -->
         <agbdownload>
             <tab>general</tab>
             <label>janolaw AGB-Hosting</label>
@@ -41,8 +10,10 @@
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
             <groups>
-                <janoloaw_agb_user translate="label" module="agbdownloader">
-                    <label>Userdaten</label>
+                <janoloaw_agb_user translate="label comment" module="agbdownloader">
+                    <label>User data</label>
+                    <comment><![CDATA[Basic settings to connect to the Janolaw service. Note that after downgrading, you must save the configuration again, to make sure that no unsupported languages are configured. Please do a manual synchronisation (System > Janolaw AGB Hosting > Status) after changing this settings.]]></comment>
+                    <expanded>1</expanded>
                     <sort_order>65</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -52,7 +23,7 @@
                             <label>Enabled</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
+                            <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -81,13 +52,23 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </api_base_url>
+
+                        <language translate="label">
+                            <label>Language</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>agbdownloader/source_language</source_model>
+                        </language>
                     </fields>
                 </janoloaw_agb_user>
 
                 <!-- only in default scope, as store specific data is handled by cms (multiple records per identifier possible) -->
-                <janoloaw_agb_cms translate="label,comment" module="agbdownloader">
+                <janoloaw_agb_cms translate="label comment" module="agbdownloader">
                     <label>Storage definitions</label>
-                    <comment>Defines block identifiers where the legal texts from janolaw are stored. Note that the content inside the blocks defined here is overwritten when synchronizing with Janolaw Hosting (in all stores!).</comment>
+                    <comment><![CDATA[Defines block identifiers where the legal texts from janolaw are stored. Note that the content inside the blocks defined here is overwritten when synchronizing with Janolaw Hosting (in all stores!).]]></comment>
                     <sort_order>75</sort_order>
                     <show_in_default>1</show_in_default>
                     <fields>
@@ -115,8 +96,47 @@
                             <sort_order>15</sort_order>
                             <show_in_default>1</show_in_default>
                         </datenschutzid>
+                        <withdrawalid translate="label">
+                            <label>Muster-Widerrufsformular Block (string identifier)</label>
+                            <frontend_type>text</frontend_type>
+                            <!-- custom frontend model to check if it should be shown or not -->
+                            <frontend_model>agbdownloader/adminhtml_system_config_form_field</frontend_model>
+                            <sort_order>17</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </withdrawalid>
                     </fields>
                 </janoloaw_agb_cms>
+
+                <janoloaw_agb_pdf translate="label" module="agbdownloader">
+                    <label>Enable PDF attachment to all emails</label>
+                    <frontend_model>agbdownloader/adminhtml_system_config_fieldset_pdf</frontend_model>
+                    <sort_order>85</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <fields>
+                        <agb translate="label">
+                            <label>AGB</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </agb>
+                        <wiederruf translate="label">
+                            <label>Widerrufsbelehrung</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </wiederruf>
+                        <withdrawal translate="label">
+                            <label>Muster-Widerrufsformular</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </withdrawal>
+
+                    </fields>
+                </janoloaw_agb_pdf>
             </groups>
         </agbdownload>
     </sections>

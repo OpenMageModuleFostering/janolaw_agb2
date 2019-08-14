@@ -8,6 +8,7 @@ class Janolaw_Agb_Model_CmsAssistant extends Mage_Catalog_Model_Abstract
     const TYPE_TAC = 'tac';
     const TYPE_PRIVACY = 'privacy';
     const TYPE_IMPRINT = 'imprint';
+    const TYPE_WITHDRAWAL = 'withdrawal';
 
     /** @var array blocks to search for... */
     protected static $_blocks = array(
@@ -28,6 +29,9 @@ class Janolaw_Agb_Model_CmsAssistant extends Mage_Catalog_Model_Abstract
         ),
         self::TYPE_IMPRINT => array(
             'Impressum_block' // janolaq old setup script
+        ),
+        self::TYPE_WITHDRAWAL => array(
+            'withdrawal_block' // janolaq old setup script
         )
     );
 
@@ -87,6 +91,9 @@ class Janolaw_Agb_Model_CmsAssistant extends Mage_Catalog_Model_Abstract
                 break;
             case self::TYPE_IMPRINT:
                 $path = Janolaw_Agb_Model_Downloader::XML_PATH_IMPRINT_ID;
+                break;
+            case self::TYPE_WITHDRAWAL:
+                $path = Janolaw_Agb_Model_Downloader::XML_PATH_WITHDRAWAL_ID;
                 break;
             default:
                 throw new InvalidArgumentException('invalid type ' . $type);

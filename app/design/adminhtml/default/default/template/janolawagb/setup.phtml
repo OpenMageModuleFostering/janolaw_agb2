@@ -15,6 +15,7 @@ $urlModel = Mage::getModel('adminhtml/url');
 $linkSysConfig = $urlModel->getUrl('adminhtml/system_config/edit', array('section' => 'agbdownload'));
 $staticBlockUrl = $urlModel->getUrl('adminhtml/cms_block/index');
 $cmsPageUrl = $urlModel->getUrl('adminhtml/cms_page/index');
+$blockWhitlistUrl = $urlModel->getUrl('adminhtml/permissions_block/index');
 $agreementsUrl = $urlModel->getUrl('adminhtml/checkout_agreement/index');
 
 /* @var $cmsAssistant Janolaw_Agb_Model_CmsAssistant */
@@ -23,6 +24,9 @@ $blockCandidates = $cmsAssistant->getBlockCandidates();
 
 $actionSetBlockId = $urlModel->getUrl('adminhtml/janolaw_setup/setBlockIdentifier');
 $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement');
+$actionAllowCmsBlocks = $urlModel->getUrl('adminhtml/janolaw_setup/allowCmsBlockIncludes');
+
+$_withdrawalFormAvailable = (bool) Mage::getSingleton('agbdownloader/downloader')->checkPdfAvailable();
 ?>
 
 <div class="content-header">
@@ -67,31 +71,31 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
     </div>
     <div class="fieldset">
         <?php if ($isInstalledMageSetup): ?>
-        <p>
-            Auf Ihrem System ist bereits das Modul <b>FireGento_MageSetup</b> installiert. Diese arbeitet optimal mit
-            dem Janolaw Modul zusammen.
-        </p>
+            <p>
+                Auf Ihrem System ist bereits das Modul <b>FireGento_MageSetup</b> installiert. Diese arbeitet optimal mit
+                dem Janolaw Modul zusammen.
+            </p>
         <?php elseif ($isInstalledGermanSetup): ?>
-        <p>
-            Auf Ihrem System ist bereits das Modul <b>FireGento_GermanSetup</b> installiert. Diese arbeitet optimal mit
-            dem Janolaw Modul zusammen.
-        </p>
+            <p>
+                Auf Ihrem System ist bereits das Modul <b>FireGento_GermanSetup</b> installiert. Diese arbeitet optimal mit
+                dem Janolaw Modul zusammen.
+            </p>
         <?php elseif ($isInstalledSymmetricsAgreement): ?>
-        <p>
-            Auf Ihrem System ist bereits das Modul <b>Symmetrics_Agreement</b> (als Teil der Modulsammlung Market
-            Ready Germany) installiert. Diese arbeitet optimal mit dem Janolaw Modul zusammen.
-        </p>
+            <p>
+                Auf Ihrem System ist bereits das Modul <b>Symmetrics_Agreement</b> (als Teil der Modulsammlung Market
+                Ready Germany) installiert. Diese arbeitet optimal mit dem Janolaw Modul zusammen.
+            </p>
         <?php else: ?>
-        <p>
-            Auf Ihrem System ist kein (bekanntes) Modul installiert, das die Einbindung von den AGB und
-            Widerruf-Texten in den Checkout-Prozess vornimmt. Wir empfehlen dazu das Modul
-            <a href="http://www.magentocommerce.com/magento-connect/firegento-magesetup.html">MageSetup von FireGento</a>.
-            Falls Sie dieses Modul installieren wollen, installieren <b>und initialisieren</b> Sie dieses Modul bitte
-            <b>bevor</b> Sie mit diesem Setup weiterfahren (beachten Sie dazu die Hinweise des Anbieters).
-            Sie erreichen diese Setup-Seite anschließend wieder über den Menü-Punkt System -&gt; Janolaw AGB Hosting
-            -&gt; Setup.
-            Alternativ können Sie das Janolaw Modul auch standalone nutzen.
-        </p>
+            <p>
+                Auf Ihrem System ist kein (bekanntes) Modul installiert, das die Einbindung von den AGB und
+                Widerruf-Texten in den Checkout-Prozess vornimmt. Wir empfehlen dazu das Modul
+                <a href="http://www.magentocommerce.com/magento-connect/firegento-magesetup.html">MageSetup von FireGento</a>.
+                Falls Sie dieses Modul installieren wollen, installieren <b>und initialisieren</b> Sie dieses Modul bitte
+                <b>bevor</b> Sie mit diesem Setup weiterfahren (beachten Sie dazu die Hinweise des Anbieters).
+                Sie erreichen diese Setup-Seite anschließend wieder über den Menü-Punkt System -&gt; Janolaw AGB Hosting
+                -&gt; Setup.
+                Alternativ können Sie das Janolaw Modul auch standalone nutzen.
+            </p>
         <?php endif; ?>
     </div>
 </div>
@@ -135,10 +139,10 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
         $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_TAC_ID, 0);
         ?>
         <?php if ($currentValue): ?>
-        <p>
-            Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
-            Sie können den Wert so belassen oder ihn ändern.
-        </p>
+            <p>
+                Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
+                Sie können den Wert so belassen oder ihn ändern.
+            </p>
         <?php endif; ?>
 
         <?php $blocks = $blockCandidates[Janolaw_Agb_Model_CmsAssistant::TYPE_TAC]; ?>
@@ -174,10 +178,10 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
         $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_REVOCATION_ID, 0);
         ?>
         <?php if ($currentValue): ?>
-        <p>
-            Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
-            Sie können den Wert so belassen oder ihn ändern.
-        </p>
+            <p>
+                Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
+                Sie können den Wert so belassen oder ihn ändern.
+            </p>
         <?php endif; ?>
 
         <?php $blocks = $blockCandidates[Janolaw_Agb_Model_CmsAssistant::TYPE_REVOCATION]; ?>
@@ -279,6 +283,53 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
             <input type="hidden" name="type" value="<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_IMPRINT; ?>"/>
             <button>CMS-Block Bezeichner für Impressum setzen</button><br />
         </form>
+
+        <!-- Withdrawal (disable if janolaw version < 3) -->
+
+        <br />
+        <b>CMS-Block zur Speicherung der Muster-Widerrufsformular</b>
+        <?php if ($_withdrawalFormAvailable): ?>
+            <?php
+                $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_WITHDRAWAL_ID, 0);
+            ?>
+            <?php if ($currentValue): ?>
+                <p>
+                    Dieser Wert ist bereits konfiguriert. Der aktuelle Wert ist <i><?php echo $currentValue; ?></i>.
+                    Sie können den Wert so belassen oder ihn ändern.
+                </p>
+            <?php endif; ?>
+            <?php $blocks = $blockCandidates[Janolaw_Agb_Model_CmsAssistant::TYPE_WITHDRAWAL]; ?>
+            <?php if (empty($blocks)): ?>
+                <p>Es wurden keine passenden Blöcke gefunden.</p>
+            <?php else: ?>
+                <p>Es wurden folgende Blöcke gefunden, die wahrscheinlich zur Speicherung der Datenschutzbestimmungen dienen:</p>
+                <ul style="margin-left: 1.5em; list-style-type: disc;">
+                    <?php foreach ($blocks as $bCandidate => $isActive): ?>
+                        <li>
+                            <?php
+                            echo $bCandidate;
+                            if (!$isActive) echo ' (aktuell nicht aktiviert)';
+                            ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+
+            <form method="post" id="form_block_id_withdrawal" action="<?php echo $actionSetBlockId; ?>" onsubmit="jlform.block_withdrawal.submit()">
+                <label for="block_id_withdrawal">Setzte Bezeichner für CMS-Block, in den die Datenschutzbestimmungen gespeichert werden sollen (Kopieren Sie einen der oben vorgeschlagenen Blöcke oder wählen Sie einen eigenen Bezeichner):</label><br />
+                <input id="block_id_withdrawal" name="block_identifier" class="validate-xml-identifier input-text" type="text" value="<?php echo $currentValue ?: ''?>"/>
+                <input type="hidden" name="type" value="<?php echo Janolaw_Agb_Model_CmsAssistant::TYPE_WITHDRAWAL; ?>"/>
+                <button>CMS-Block Bezeichner für Muster-Widerrufsformular setzen</button><br />
+            </form>
+        <?php else: ?>
+            <p class="error">
+                Sie verwenden eine ältere Versiondes AGB Hosting-Service von janolaw.
+                Bitte legen Sie für das Muster-Widerrufsformular eine neue Seite im Content Bereich an und
+                kopieren den Inhalt des Muster-Widerrufsformular herein.
+            </p>
+        <?php endif; ?>
+
     </div>
 </div>
 
@@ -307,9 +358,10 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
     </div>
     <div class="fieldset">
         <p>
-            In der Regel sollen alle vier Texte als CMS-Seite in Ihrem Shop angezeigt werden. Dazu müssen CMS-Seiten
-            erstellt werden (wenn sie nicht bereits existieren) und die oben konfigurierten CMS-Blöcke eingebunden
-            werden.
+            Die 5 Texte müssen als CMS-Seite in Ihrem Shop angezeigt werden. Die AGB, Widerrufsbelehrung und
+            das Muster-Widerrufsformular müssen per E-Mail oder spätestens mit dem Warenversand in Papierform zuschickt werden.
+            Dazu müssen CMS-Seiten erstellt werden (wenn sie nicht bereits existieren) und die oben konfigurierten
+            CMS-Blöcke eingebunden werden.
         </p>
         <p>
             Als ersten Schritt müssen Sie dazu herausfinden, welche Seiten bereits existieren. Die schon erwähnten Module
@@ -373,8 +425,8 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
             <pre><?php echo $cmsAssistant->getCmsDirectiveSnippet($currentValue); ?></pre>
         <?php else: ?>
             <p>
-            Es wurde noch kein CMS-Block zur Speicherung der Datenschutzbestimmungen definiert. (Bitte befolgen Sie die Anweisungen
-            aus Schritt 2).
+                Es wurde noch kein CMS-Block zur Speicherung der Datenschutzbestimmungen definiert. (Bitte befolgen Sie die Anweisungen
+                aus Schritt 2).
             </p>
         <?php endif; ?>
 
@@ -391,12 +443,48 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
         <?php endif; ?>
 
         <br />
+        <b>Snippet zur Einbindung der Muster-Widerrufsformular:</b>
+        <?php $currentValue = Mage::getStoreConfig(Janolaw_Agb_Model_Downloader::XML_PATH_WITHDRAWAL_ID, 0); ?>
+        <?php if ($currentValue): ?>
+            <pre><?php echo $cmsAssistant->getCmsDirectiveSnippet($currentValue); ?></pre>
+        <?php else: ?>
+            <p>
+                Es wurde noch kein CMS-Block zur Speicherung des Muster-Widerrufsformular definiert. (Bitte befolgen Sie die Anweisungen
+                aus Schritt 2).
+            </p>
+        <?php endif; ?>
+
+        <br />
         <p>
             Nun sollten Sie sicherstellen, dass die angelegten Seiten verlinkt werden. Meistens
             nutzt man dafür den Footer. In einem neu installierten Magento gibt es bereits einen
             CMS-Block mit dem Bezeichner
             &quot;footer_links&quot; (bzw. &quot;footer_links_company&quot; ab v1.9), bei dem Sie
             Links zu den neu angelegten Seiten definieren können.
+        </p>
+
+        <p style="background-color: white; border: 1px solid black; padding: 1em;">
+            Bitte beachten Sie: Seit der Magento-Version CE-1.9.2.2, bzw. dem Patch <i>SUPEE-6788</i>
+            werden in Templates eingebundene CMS-Blöcke aus Sicherheitsgründen gegen eine Whitelist geprüft.
+            Ist dieser Block-Typ nicht in der Whitelist definiert, wird der entsprechende Text
+            nicht ausgegeben.
+
+            <br/><br/>
+
+            Das Modul fügt automatisch den Block Typ <code>cms/block</code> zur Whitelist, der für die
+            Speicherung der Gesetzestexte verwendet wird. Falls Sie den Patch erst nach der Installation
+            dieses Moduls hinzugefügt haben, können Sie den folgenden Button klicken, um CMS Blöcke
+            zu erlauben.
+
+            <br/><br/>
+            <button onclick="jlform.allowCmsBlockIncludes();">CMS-Block Bezeichner für Muster-Widerrufsformular setzen</button>
+            <br/><br/>
+
+            Außerdem können Sie die
+            <a target="_blank" href="<?php echo $blockWhitlistUrl; ?>">Whitelist hier</a>
+            manuell verwalten.
+            (Wenn der link nicht funktioniert, existiert
+            die Whitelist nicht, Sie sollten in diesem Fall den Security patch SUPEE-6788 installieren).
         </p>
     </div>
 </div>
@@ -507,16 +595,38 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
     jlform.block_revocation = new varienForm("form_block_id_revocation", "");
     jlform.block_privacy = new varienForm("form_block_id_privacy", "");
     jlform.block_imprint = new varienForm("form_block_id_imprint", "");
+    if (document.getElementById("form_block_id_withdrawal")) {
+        jlform.block_withdrawal = new varienForm("form_block_id_withdrawal", "");
+    }
+
+    jlform.defaultAjaxSuccessHandler = function(response) {
+        var result = response.responseText.evalJSON();
+        if (result.message) {
+            alert(result.message);
+        } else {
+            alert("Ein Fehler ist aufgetreten");
+        }
+    };
+
+    jlform.defaultAjaxErrorHandler = function(response) {
+        alert("Ein Fehler ist aufgetreten");
+    };
+
     document.observe("dom:loaded", function() {
         var jlform_fkey = new Element("input", {
             "type" : "hidden",
             "name" : "form_key",
             "value" : FORM_KEY
         });
+        var withdrawalBlock = document.getElementById("form_block_id_withdrawal"); // perhaps not available
+
         document.getElementById("form_block_id_tac").insert(jlform_fkey.clone());
         document.getElementById("form_block_id_revocation").insert(jlform_fkey.clone());
         document.getElementById("form_block_id_privacy").insert(jlform_fkey.clone());
         document.getElementById("form_block_id_imprint").insert(jlform_fkey.clone());
+        if (withdrawalBlock) {
+            withdrawalBlock.insert(jlform_fkey.clone());
+        }
     });
 
     jlform.createAgreement = function(agreement_type) {
@@ -536,19 +646,19 @@ $actionSaveAgreement = $urlModel->getUrl('adminhtml/janolaw_setup/saveAgreement'
         var req = new Ajax.Request("<?php echo $actionSaveAgreement; ?>", {
             "method": "post",
             "parameters": data,
-            onSuccess: function(response) {
-                var result = response.responseText.evalJSON();
-                if (result.message) {
-                    alert(result.message);
-                } else {
-                    alert("Ein Fehler ist aufgetreten");
-                }
-            },
-            onFailure: function(response) {
-                alert("Ein Fehler ist aufgetreten");
-            }
+            onSuccess: jlform.defaultAjaxSuccessHandler,
+            onFailure: jlform.defaultAjaxErrorHandler
         });
-    }
+    };
+
+    jlform.allowCmsBlockIncludes = function() {
+        var req = new Ajax.Request("<?php echo $actionAllowCmsBlocks; ?>", {
+            method: "post",
+            parameters: { form_key: FORM_KEY, is_ajax: 1 },
+            onSuccess: jlform.defaultAjaxSuccessHandler,
+            onFailure: jlform.defaultAjaxErrorHandler
+        });
+    };
 
 </script>
 

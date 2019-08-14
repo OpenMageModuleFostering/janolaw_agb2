@@ -43,6 +43,9 @@ class Janolaw_Agb_Block_Adminhtml_Status_Config extends Mage_Adminhtml_Block_Abs
         $shopId = Mage::getStoreConfig(\Janolaw_Agb_Model_Downloader::XML_PATH_SHOP_ID, 0);
         $userId = Mage::getStoreConfig(\Janolaw_Agb_Model_Downloader::XML_PATH_USER_ID, 0);
         $baseUrl = Mage::getStoreConfig(\Janolaw_Agb_Model_Downloader::XML_PATH_API_BASE_URL, 0);
+        $shopId = trim($shopId);
+        $userId = trim($userId);
+        $baseUrl = trim($baseUrl);
 
         if (empty($shopId)) {
             $missing['shop_id'] = 'Shop Id';

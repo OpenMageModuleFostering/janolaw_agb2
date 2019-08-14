@@ -4,6 +4,11 @@
 class Janolaw_Agb_Adminhtml_Janolaw_StatusController extends Mage_Adminhtml_Controller_Action
 {
 
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('admin/system/janolaw/status');
+    }
+
     /**
      * Print info about state of janolaw module..
      */

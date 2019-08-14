@@ -1,14 +1,13 @@
 {
     "name": "OpenMageModuleFostering/janolaw_agb2",
     "type": "magento-module",
-    "license": "OSL",
+    "license": "OSL-3.0",
     "homepage": "",
-    "description": "Dieses Modul integriert die von Janolaw AGB Hosting bereitgestellten Texte (AGB, Widerrufsbelehrung, Impressum, Datenschutzbestimmungen) in Ihren Magento-Shop.
-",
+    "description": "This module integrates the legal texts provided by Janolaw AGB Hosting into your magento store.",
     "authors": [
     {
-        "name": "Claudio Kressibucher",
-        "email": "ck@inmedias.de"
+        "name": "team in medias",
+        "email": "technik@inmedias.de"
     }
 ],
     "suggest": {

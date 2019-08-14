@@ -9,7 +9,7 @@ class Janolaw_Agb_Helper_HttpStatusNotSuccessfulException extends Exception
      */
     public $response;
 
-    public function __counstruct(Zend_Http_Response $response, $msg = null)
+    public function __construct(Zend_Http_Response $response, $msg = null)
     {
         if (is_null($msg)) {
             $msg = 'Unexpected Http status code: ' . $response->getStatus();

@@ -21,8 +21,33 @@
 "Include T&C pdf as Attachment","AGB als PDF-Anhang hinzufügen"
 "Include revocation pdf as Attachment","Widerrufsbelehrung als PDF-Anhang hinzufügen"
 "Terms-and-conditions","AGB"
+"Legal-details","Legal-details"
 "Revocation-policy","Widerrufsbelehrung"
+"Data-security","Data-security"
+"Withdrawal","Muster-Widerrufsformular"
 "Given block identifer (%s) has the wrong format.","Der angegebene Block-Bezeichner (%s) hat ein ungültiges Format"
 "Given block identifier is too large (only 255 characters allowed at maximum)","Der angegebene Block-Bezeichner ist zu lang (maximal 255 Zeichen sind erlaubt)"
 "Missing configuration for","Fehlende Konfiguration für"
 "Edit configuration","Konfiguration bearbeiten"
+"Enable PDF attachment to all emails","Enable PDF attachment to all emails"
+"German","Deutsch"
+"English","English"
+"French","Französisch"
+"Please check, if you have booked the multi-language option of the janolaw service.","Bitte prüfen Sie, ob Sie die Texte neu generiert haben und für die optionale mehrsprachige Version den Service bei janolaw gebucht haben."
+"Please note:
+If you don't want to regenerate the texts, you should insert the documents to the order confirmation email using the snippets. This should add the content of the documents to the email text.
+You find an overview of the available snippets in the Janolaw AGB Hosting Setup, step 3
+Important:
+The terms and conditions, cancellation policy and the withdrawal form must be sent by e-mail or at the latest with the dispatch of goods.","Hinweis:
+Wenn Sie die Texte nicht neu generieren möchten dann fügen Sie bitte die Dokumente mit den Snippets in die E-Mail Auftragsbestätigung mit ein. Der Wortlaut der ausgewählten Texte wird dann automatisch in die E-Mail eingebunden.
+Eine Übersicht der Snippets finden Sie im Janolaw AGB Hosting – Setup Schritt 3
+Wichtig:
+Die AGB, Widerrufsbelehrung und das Muster-Widerrufsformular müssen per E-Mail oder spätestens mit dem Warenversand in Papierform zuschickt werden."
+"User data","Userdaten"
+"Storage definitions","Speicher-Definition"
+"Enable PDF attachment to all emails","Aktiviere PDF Anhänge für alle E-Mails"
+"Defines block identifiers where the legal texts from janolaw are stored. Note that the content inside the blocks defined here is overwritten when synchronizing with Janolaw Hosting (in all stores!).","Definiert die CMS-Block Schlüssel (identifier), in denen die Texte gespeichert werden. Bitte beachten Sie, dass diese Texte beim Synchronisieren überschrieben werden!"
+"Basic settings to connect to the Janolaw service. Note that after downgrading, you must save the configuration again, to make sure that no unsupported languages are configured. Please do a manual synchronisation (System > Janolaw AGB Hosting > Status) after changing this settings.","Grundlegende Einstellungen zur Verbindung zum Janolaw Service. Bitte beachten Sie, dass nach Änderung der Daten die Konfiguration nochmal erneut gespeichert werden muss, um sicherzustellen, dass eine unterstützte Sprache konfiguriert ist. Bitte starten Sie eine manuelle Synchronisation (unter System > Janolaw AGB Hosting > Status) nachdem Sie die Konfiguration geändert haben."
+
+"There is no block whitelist avaialable in your system. Please install the Magento Security patch SUPEE-6788","Es existiert keine Block Whitelist in Ihrem System. Bitte installieren Sie den Magento Security patch SUPEE-6788"
+"Successfully defined cms block type as 'allowed' in block whitelist","CMS Block Type erfolgreich als 'erlaubt' definiert."

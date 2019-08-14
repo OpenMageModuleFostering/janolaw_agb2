@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Janolaw_Agb>
-            <version>0.1.6</version>
+            <version>0.2.6</version>
         </Janolaw_Agb>
     </modules>
     <global>
@@ -17,6 +17,7 @@
             <core>
                 <rewrite>
                     <email_template>Janolaw_Agb_Model_Email_Template</email_template>
+                    <email_queue>Janolaw_Agb_Model_Email_Queue</email_queue>
                 </rewrite>
             </core>
         </models>
@@ -42,17 +43,25 @@
             </agb_setup>
         </resources>
         <events>
-            <!-- we do not support pdf attachments yet, but will probably do so later.. -->
-            <!--
+            <!-- pdf attachments to transaction email -->
             <janolaw_send_transactional_before>
                 <observers>
                     <neworder_add_attachement>
                         <class>agbdownloader/observer</class>
-                        <method>addAttachmentToNewOrderEmail</method>
+                        <method>addAttachmentTransactionEmail</method>
                     </neworder_add_attachement>
                 </observers>
             </janolaw_send_transactional_before>
-            -->
+
+            <!-- pdf attachments to queue email (since magento CE 1.9.1)-->
+            <janolaw_send_queue_before>
+                <observers>
+                    <neworder_add_attachement>
+                        <class>agbdownloader/observer</class>
+                        <method>addAttachmentQueueEmail</method>
+                    </neworder_add_attachement>
+                </observers>
+            </janolaw_send_queue_before>
         </events>
     </global>
 
@@ -118,18 +127,27 @@
                 </observers>
             </core_block_abstract_to_html_before>
         </events>
+        <layout>
+            <updates>
+                <baseprice>
+                    <file>agbdownloader.xml</file>
+                </baseprice>
+            </updates>
+        </layout>
     </frontend>
 
     <default>
         <agbdownload>
             <janoloaw_agb_user>
                 <api_base_url><![CDATA[http://www.janolaw.de/agb-service/shops]]></api_base_url>
+                <language>de</language>
             </janoloaw_agb_user>
             <janoloaw_agb_cms>
                 <agbid></agbid> <!-- empty values prevent the system from creating or overwriting any pages/blocks, so we use that as default... -->
                 <impressumid></impressumid>
                 <wiederrufid></wiederrufid>
                 <datenschutzid></datenschutzid>
+                <withdrawalid></withdrawalid>
             </janoloaw_agb_cms>
         </agbdownload>
     </default>
@@ -139,7 +157,7 @@
             <janolaw_import_all>
                 <schedule>
                     <!-- every second hour -->
-                    <cron_expr>* */2 * * *</cron_expr>
+                    <cron_expr>5 */2 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>agbdownloader/downloader::download</model>

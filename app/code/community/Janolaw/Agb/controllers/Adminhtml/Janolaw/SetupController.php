@@ -5,6 +5,11 @@ class Janolaw_Agb_Adminhtml_Janolaw_SetupController extends Mage_Adminhtml_Contr
 
     protected $_lastError = '';
 
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('admin/system/janolaw/setup');
+    }
+
     /**
      * Show setup page
      */
@@ -76,6 +81,21 @@ class Janolaw_Agb_Adminhtml_Janolaw_SetupController extends Mage_Adminhtml_Contr
         } catch (Exception $e) {
             $this->_lastError = $this->_getHelper()->__('Could not save block identifier to configuration. Details: %s', $e->getMessage());
             $this->_endRequest(false, $this->_lastError);
+        }
+    }
+
+    public function allowCmsBlockIncludesAction()
+    {
+        $helper = $this->_getHelper();
+        try {
+            $helper->allowCmsBlockIncludes();
+            $successMsg = $helper->__('Successfully defined cms block type as \'allowed\' in block whitelist');
+            $this->_endRequest(true, $successMsg);
+        } catch (Janolaw_Agb_Helper_NoBlockWhitelistException $e) {
+            $msg = $helper->__(
+                'There is no block whitelist avaialable in your system. Please install the Magento Security patch SUPEE-6788'
+            );
+            $this->_endRequest(false, $msg);
         }
     }
 

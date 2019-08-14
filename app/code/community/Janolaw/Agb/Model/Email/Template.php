@@ -8,7 +8,7 @@ class Janolaw_Agb_Model_Email_Template extends Mage_Core_Model_Email_Template
         Mage::dispatchEvent(
             'janolaw_send_transactional_before',
             array(
-                'tempalte_id' => $templateId,
+                'template_id' => $templateId,
                 'sender' => $sender,
                 'recipient_email' => $email,
                 'recipient_name' => $name,
@@ -23,7 +23,7 @@ class Janolaw_Agb_Model_Email_Template extends Mage_Core_Model_Email_Template
         Mage::dispatchEvent(
             'janolaw_send_transactional_after',
             array(
-                'tempalte_id' => $templateId,
+                'template_id' => $templateId,
                 'sender' => $sender,
                 'recipient_email' => $email,
                 'recipient_name' => $name,

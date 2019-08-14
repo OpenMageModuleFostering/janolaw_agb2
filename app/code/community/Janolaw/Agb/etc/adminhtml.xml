@@ -39,6 +39,14 @@
                             <janolaw translate="title">
                                 <title>Janolaw AGB</title>
                                 <sort_order>10</sort_order>
+                                <children>
+                                    <status>
+                                        <title>Status</title>
+                                    </status>
+                                    <setup>
+                                        <title>Setup</title>
+                                    </setup>
+                                </children>
                             </janolaw>
                         </children>
                     </system>
