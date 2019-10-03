@@ -1,3 +1,5 @@
+
+
 ## Original Package Description
 
 This module integrates the legal texts provided by Janolaw AGB Hosting into your magento store.
