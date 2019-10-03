@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/janolaw_agb2",
+    "name": "OpenMageModuleFostering\/janolaw_agb2",
     "type": "magento-module",
     "license": "OSL-3.0",
     "homepage": "",
     "description": "This module integrates the legal texts provided by Janolaw AGB Hosting into your magento store.",
     "authors": [
-    {
-        "name": "team in medias",
-        "email": "technik@inmedias.de"
-    }
-],
+        {
+            "name": "team in medias",
+            "email": "technik@inmedias.de"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
